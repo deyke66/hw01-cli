@@ -1,6 +1,6 @@
 const fs = require("fs/promises");
-const nanoid = require("nanoid");
 const path = require("path");
+const crypto = require("crypto");
 
 const contactsPath = path.join(__dirname, "./db/contacts.json");
 
@@ -9,8 +9,8 @@ async function readContacts() {
   return JSON.parse(data);
 }
 async function writeContacts(contacts) {
-  await fs.writeFile(contactPath, JSON.stringify(contacts, null, 2));
-  return contacts;
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  return;
 }
 
 async function listContacts() {
@@ -30,16 +30,26 @@ async function removeContact(contactId) {
   }
   const bookIndex = data.findIndex((book) => book.id === contactId);
   data.splice(bookIndex, 1);
-  return writeContacts(data);
+  writeContacts(data);
+  return console.log(findBook);
 }
 async function addContact(name, email, phone) {
   const data = await readContacts();
   const newContact = {
-    id: nanoid(),
+    id: crypto.randomUUID(),
     name,
     email,
     phone,
   };
   data.push(newContact);
-  return writeContacts(data);
+
+  writeContacts(data);
+  return newContact;
 }
+
+module.exports = {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+};
